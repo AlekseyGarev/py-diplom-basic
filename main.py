@@ -15,7 +15,7 @@ if n_photo.isdigit():
     n_photo = int(n_photo)
 else:
     print('Вы ввели не число! По умолчанию ставим - 5')
-    n_photo = int(5)   
+    n_photo = 5   
 
 
 ya_token = input('Введите токен с Полигона Яндекс.Диска:')
