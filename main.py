@@ -4,14 +4,19 @@ from datetime import datetime
 from tqdm import tqdm
 from tokens import vk_token 
 
-name_list = []
+
 result_data = []
 
 id_vk = input('Введите айди пользователя:')
  
 n_photo = input('Введите кол-во фото для скачивания(По умолчанию 5шт):')
-if n_photo == '':
-    n_photo = 5
+
+if n_photo.isdigit():
+    n_photo = int(n_photo)
+else:
+    print('Вы ввели не число! По умолчанию ставим - 5')
+    n_photo = int(5)   
+
 
 ya_token = input('Введите токен с Полигона Яндекс.Диска:')
 
@@ -31,19 +36,28 @@ data = response.json()
 total_photos = data['response']['count']
 print(f'Найдено:{total_photos} фото!')
 
+if n_photo > total_photos:
+    download_photo = total_photos
+else:
+    download_photo = n_photo    
+
 yd_url = 'https://cloud-api.yandex.net/v1/disk/resources'
 params = {'path': 'Photo'}
 headers = {'Authorization': ya_token}
 response = requests.put(yd_url, params=params, headers=headers)
 
-with tqdm(total=n_photo, desc="Процесс выполнения", unit="фото") as pbar:
-
+with tqdm(total=download_photo, desc="Процесс выполнения", unit="фото") as pbar:
+    name_list = []
+    
     for item in data['response']['items']:
-        img_url = item['orig_photo']['url']
+        img_url = item['sizes'][-1]['url']
         img_name = item['likes']['count']
         if img_name in name_list:
             current_time = datetime.now().strftime("%Y%m%d_%H%M%S")
             img_name = f"{item['likes']['count']}_{current_time}"
+        else:
+            name_list.append(img_name)
+
 
         result_data.append({
             "file_name": f"{img_name}.jpg",
